@@ -3,349 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma de Evaluación de Usabilidad Web</title>
-
-    <!-- Tailwind CSS -->
+    <title>Informe de Evaluación de Usabilidad UX</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- jsPDF & html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas & jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <!-- Archivo de Estilos Personalizados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- CSS Personalizado -->
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen p-4 md:p-8">
 
-    <!-- Encabezado de la Aplicación -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-indigo-600 p-2 rounded-lg">
-                    <i class="fa-solid fa-vial-circle-check text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">UsabiLab UX</h1>
-                    <p class="text-xs text-slate-400">Evaluación de Métricas Cuantitativas y Cualitativas</p>
-                </div>
+    <!-- CONTENEDOR PRINCIPAL IMPRESO EN PDF -->
+    <main id="report-container" class="max-w-7xl mx-auto space-y-6 p-6 bg-slate-50 rounded-2xl shadow-sm border border-slate-200">
+
+        <!-- Encabezado con Nombres, Repositorio y Botón de PDF -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Informe de Evaluación de Usabilidad UX</h1>
+                <p class="text-sm text-slate-600 mt-1">
+                    <strong>Integrantes:</strong> Cantos Yépez, Macías Lucas y Lucas
+                </p>
+                <p class="text-xs text-indigo-600 mt-1">
+                    <strong>Repositorio GitHub:</strong> 
+                    <a href="https://github.com/ElkinC1/Usabilidad_y_accesibilidad.git" target="_blank" class="underline hover:text-indigo-800">
+                        github.com/ElkinC1/Usabilidad_y_accesibilidad
+                    </a>
+                </p>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="exportToPDF(event)" class="bg-rose-600 hover:bg-rose-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    <span>Descargar Reporte PDF</span>
+            <div class="no-print">
+                <button onclick="exportToPDF(event)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Descargar Reporte PDF
                 </button>
             </div>
         </div>
-    </header>
 
-    <!-- Contenido Principal -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full space-y-8" id="report-container">
-        
-        <!-- Encabezado Visible en PDF/Impresión -->
-        <div class="hidden print-only p-6 bg-white border-b border-slate-300 mb-6">
-            <div class="flex justify-between items-center">
+        <!-- FORMULARIO PARA REGISTRAR NUEVAS EVALUACIONES (Oculto en el PDF generado) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 no-print">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-indigo-600"></i> Registrar Nueva Evaluación / Función
+            </h3>
+            <form id="evaluation-form" onsubmit="addNewEvaluation(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Informe de Evaluación de Usabilidad Web</h1>
-                    <p class="text-sm text-slate-600">Reporte de Desempeño y Métricas de Experiencia de Usuario</p>
+                    <label class="block font-medium text-slate-700 mb-1">Nombre de la Tarea</label>
+                    <input type="text" id="input-task" required placeholder="Ej: Restablecer contraseña" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
-                <div class="text-right text-xs text-slate-500">
-                    <p>Fecha de emisión: <span id="print-date"></span></p>
-                    <p>Grupo de Desarrollo Web #2</p>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Categoría / Componente</label>
+                    <select id="input-category" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="Entrada de Datos / Formulario">Entrada de Datos / Formulario</option>
+                        <option value="Búsqueda / Filtros">Búsqueda / Filtros</option>
+                        <option value="Visualización / Tablas">Visualización / Tablas</option>
+                        <option value="Navegación / Botones">Navegación / Botones</option>
+                    </select>
                 </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Tiempo (segundos)</label>
+                    <input type="number" id="input-time" min="1" required placeholder="Ej: 14" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Errores Cometidos</label>
+                    <input type="number" id="input-errors" min="0" required placeholder="Ej: 0" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Tasa de Éxito (%)</label>
+                    <input type="number" id="input-success" min="0" max="100" required placeholder="100" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Puntaje CSAT (1-5)</label>
+                    <input type="number" id="input-csat" min="1" max="5" step="0.1" required placeholder="Ej: 4.5" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Puntaje SEQ (1-7)</label>
+                    <input type="number" id="input-seq" min="1" max="7" step="0.1" required placeholder="Ej: 6" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-medium text-slate-700 mb-1">Observaciones</label>
+                    <input type="text" id="input-obs" placeholder="Ej: Pasos muy largos" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div class="md:col-span-4 flex justify-end">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Agregar Evaluación
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tarjetas de Métricas Clave -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Tareas Evaluadas</p>
+                <p id="kpi-total" class="text-2xl font-extrabold text-slate-800 mt-1">0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Tasa de Aceptación</p>
+                <p id="kpi-rate" class="text-2xl font-extrabold text-emerald-600 mt-1">0%</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Tiempo Promedio</p>
+                <p id="kpi-time" class="text-2xl font-extrabold text-indigo-600 mt-1">0.0s</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Satisfacción Prom. (CSAT)</p>
+                <p id="kpi-csat" class="text-2xl font-extrabold text-amber-500 mt-1">0.0/5</p>
             </div>
         </div>
 
-        <!-- Resumen Rápido / KPI Dashboard -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Tareas Evaluadas</p>
-                    <p class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-total">0</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
-                    <i class="fa-solid fa-list-check text-xl"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tasa de Aceptación</p>
-                    <p class="text-3xl font-extrabold text-emerald-600 mt-1" id="stat-acceptable-pct">0%</p>
-                </div>
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
-                    <i class="fa-solid fa-circle-check text-xl"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tiempo Promedio</p>
-                    <p class="text-3xl font-extrabold text-indigo-600 mt-1" id="stat-avg-time">0s</p>
-                </div>
-                <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
-                    <i class="fa-solid fa-stopwatch text-xl"></i>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Satisfacción Prom. (CSAT)</p>
-                    <p class="text-3xl font-extrabold text-amber-600 mt-1" id="stat-avg-csat">0 / 5</p>
-                </div>
-                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600">
-                    <i class="fa-solid fa-face-smile text-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seccion 1: Formulación e Ingreso de Datos -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Columna Izquierda: Formulario de Evaluación / Registro -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 no-print">
-                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                    <i class="fa-solid fa-pen-to-square text-indigo-600 text-lg"></i>
-                    <h2 class="font-bold text-slate-800 text-base">Registrar Nueva Evaluación</h2>
-                </div>
-
-                <form id="evaluation-form" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre de la Tarea / Componente</label>
-                        <input type="text" id="task-name" required placeholder="Ej: Registro de usuario en formulario" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipo de Componente Evaluado</label>
-                        <select id="task-category" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="Entrada de Datos / Formulario">Entrada de Datos / Formulario</option>
-                            <option value="Navegación / Botones">Navegación / Botones</option>
-                            <option value="Visualización / Tablas">Visualización / Tablas</option>
-                            <option value="Búsqueda / Filtros">Búsqueda / Filtros</option>
-                            <option value="Listas / Desplegables">Listas / Desplegables</option>
-                        </select>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-                        <span class="text-xs font-bold text-indigo-900 uppercase tracking-wide block">Métricas Cuantitativas</span>
-                        
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <label class="text-slate-600">Tiempo de Ejecución (s)</label>
-                                <span class="text-slate-400">Max. Aceptable: <strong id="max-time-label">15s</strong></span>
-                            </div>
-                            <input type="number" id="time-val" required min="1" max="300" placeholder="Ej: 12" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <label class="text-slate-600">Número de Errores Cometidos</label>
-                                <span class="text-slate-400">Max. Aceptable: <strong id="max-err-label">1</strong></span>
-                            </div>
-                            <input type="number" id="error-val" required min="0" max="20" placeholder="Ej: 0" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-slate-600 mb-1">Tasa de Éxito en la Tarea</label>
-                            <select id="success-val" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="100">Éxito Total (100%)</option>
-                                <option value="50">Éxito Parcial con Ayuda (50%)</option>
-                                <option value="0">Fracaso / Incompleto (0%)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-                        <span class="text-xs font-bold text-amber-900 uppercase tracking-wide block">Métricas Cualitativas</span>
-                        
-                        <div>
-                            <label class="block text-xs text-slate-600 mb-1">Satisfacción Percibida (CSAT 1-5)</label>
-                            <select id="csat-val" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="5">5 - Muy Satisfecho</option>
-                                <option value="4">4 - Satisfecho</option>
-                                <option value="3">3 - Neutral</option>
-                                <option value="2">2 - Insatisfecho</option>
-                                <option value="1">1 - Muy Insatisfecho</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-slate-600 mb-1">Facilidad de Uso SEQ (1-7)</label>
-                            <select id="seq-val" class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                                <option value="7">7 - Muy Fácil</option>
-                                <option value="6">6 - Fácil</option>
-                                <option value="5">5 - Moderadamente Fácil</option>
-                                <option value="4">4 - Neutral</option>
-                                <option value="3">3 - Algo Difícil</option>
-                                <option value="2">2 - Difícil</option>
-                                <option value="1">1 - Muy Difícil</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs text-slate-600 mb-1">Comentario del Usuario / Observación</label>
-                            <textarea id="comment-val" rows="2" placeholder="Observaciones durante la prueba..." class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 shadow">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Agregar Evaluación</span>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Columna Derecha: Explicación de Métricas y Parámetros Umbrales -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Tabla de Parámetros/Umbrales Establecidos -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-indigo-600 text-lg"></i>
-                            <h2 class="font-bold text-slate-800 text-base">Parámetros de Aceptabilidad Configurados</h2>
-                        </div>
-                        <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-medium">Criterios ISO 9241-11</span>
-                    </div>
-
-                    <p class="text-xs text-slate-600 mb-4">
-                        Una evaluación se clasifica dinámicamente como <strong class="text-emerald-600">Aceptable</strong> solo si cumple simultáneamente los umbrales límite definidos tanto cuantitativos como cualitativos.
-                    </p>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-xs text-left text-slate-600">
-                            <thead class="bg-slate-100 text-slate-700 uppercase font-semibold">
-                                <tr>
-                                    <th class="px-3 py-2.5 rounded-l-lg">Tipo de Métrica</th>
-                                    <th class="px-3 py-2.5">Indicador / Tarea</th>
-                                    <th class="px-3 py-2.5">Umbral Aceptable</th>
-                                    <th class="px-3 py-2.5 rounded-r-lg">Criterio de Evaluación</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                <tr>
-                                    <td class="px-3 py-2 font-medium text-slate-900">Cuantitativa</td>
-                                    <td class="px-3 py-2">Tiempo de Ejecución</td>
-                                    <td class="px-3 py-2 font-semibold text-slate-700">≤ 15 Segundos</td>
-                                    <td class="px-3 py-2 text-slate-500">Mide la eficiencia en el flujo de interacción.</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3 py-2 font-medium text-slate-900">Cuantitativa</td>
-                                    <td class="px-3 py-2">Tasa de Errores</td>
-                                    <td class="px-3 py-2 font-semibold text-slate-700">≤ 1 Error por tarea</td>
-                                    <td class="px-3 py-2 text-slate-500">Mide la efectividad y prevención de fallos.</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3 py-2 font-medium text-slate-900">Cuantitativa</td>
-                                    <td class="px-3 py-2">Tasa de Éxito</td>
-                                    <td class="px-3 py-2 font-semibold text-slate-700 font-bold text-emerald-600">100% (Completado)</td>
-                                    <td class="px-3 py-2 text-slate-500">Cumplimiento total del objetivo de la tarea.</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3 py-2 font-medium text-slate-900">Cualitativa</td>
-                                    <td class="px-3 py-2">Satisfacción CSAT</td>
-                                    <td class="px-3 py-2 font-semibold text-slate-700">≥ 4.0 / 5.0</td>
-                                    <td class="px-3 py-2 text-slate-500">Percepción general de confort del usuario.</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-3 py-2 font-medium text-slate-900">Cualitativa</td>
-                                    <td class="px-3 py-2">Facilidad SEQ</td>
-                                    <td class="px-3 py-2 font-semibold text-slate-700">≥ 5.0 / 7.0</td>
-                                    <td class="px-3 py-2 text-slate-500">Esfuerzo mental reportado tras la acción.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Gráficos de Resultados -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-indigo-600 text-lg"></i>
-                            <h2 class="font-bold text-slate-800 text-base">Análisis Gráfico de Resultados</h2>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Gráfico 1: Aceptables vs No Aceptables -->
-                        <div class="flex flex-col items-center">
-                            <h3 class="text-xs font-semibold text-slate-500 mb-2">Distribución Global de Usabilidad</h3>
-                            <div class="w-full max-w-[220px] h-[220px]">
-                                <canvas id="chart-status"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Gráfico 2: Desempeño por Categoría -->
-                        <div class="flex flex-col items-center">
-                            <h3 class="text-xs font-semibold text-slate-500 mb-2">Tiempo Promedio por Componente (s)</h3>
-                            <div class="w-full h-[220px]">
-                                <canvas id="chart-performance"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Seccion 2: Tabla Dinámica de Resultados -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-6 pb-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h2 class="font-bold text-slate-800 text-lg">Tabla de Resultados de Usabilidad</h2>
-                    <p class="text-xs text-slate-500">Evaluación consolidada de parámetros cuantitativos y cualitativos</p>
-                </div>
-                
-                <div class="flex items-center gap-2 no-print">
-                    <button onclick="seedDefaultData()" class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
-                        <i class="fa-solid fa-rotate-right mr-1"></i> Cargar Ejemplos
-                    </button>
-                    <button onclick="clearEvaluations()" class="px-3 py-1.5 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-colors">
-                        <i class="fa-solid fa-trash mr-1"></i> Limpiar Todo
-                    </button>
-                </div>
-            </div>
-
+        <!-- Parámetros de Aceptabilidad Configurados -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h3 class="font-bold text-slate-800 text-sm">Parámetros de Aceptabilidad Configurados</h3>
+            <p class="text-xs text-slate-500">
+                Una evaluación se clasifica dinámicamente como <strong>Aceptable</strong> solo si cumple simultáneamente los umbrales límite definidos tanto cuantitativos como cualitativos.
+            </p>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-xs text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-800 text-white text-xs uppercase font-semibold">
-                            <th class="p-3.5">ID / Tarea</th>
-                            <th class="p-3.5">Componente</th>
-                            <th class="p-3.5">Tiempo (s)</th>
-                            <th class="p-3.5">Errores</th>
-                            <th class="p-3.5">Éxito</th>
-                            <th class="p-3.5">CSAT / SEQ</th>
-                            <th class="p-3.5">Observaciones</th>
-                            <th class="p-3.5 text-center">Estado Usabilidad</th>
-                            <th class="p-3.5 text-center no-print">Acción</th>
+                        <tr class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="p-2">TIPO DE MÉTRICA</th>
+                            <th class="p-2">INDICADOR / TAREA</th>
+                            <th class="p-2">UMBRAL ACEPTABLE</th>
+                            <th class="p-2">CRITERIO DE EVALUACIÓN</th>
                         </tr>
                     </thead>
-                    <tbody id="results-table-body" class="divide-y divide-slate-100 text-xs">
-                        <!-- Filas generadas dinámicamente -->
+                    <tbody class="divide-y divide-slate-200 text-slate-600">
+                        <tr>
+                            <td class="p-2">Cuantitativa</td>
+                            <td class="p-2">Tiempo de Ejecución</td>
+                            <td class="p-2 font-medium text-slate-800">&le; 15 Segundos</td>
+                            <td class="p-2">Mide la eficiencia en el flujo de interacción.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2">Cuantitativa</td>
+                            <td class="p-2">Tasa de Errores</td>
+                            <td class="p-2 font-medium text-slate-800">&le; 1 Error por tarea</td>
+                            <td class="p-2">Mide la efectividad y prevención de fallos.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2">Cuantitativa</td>
+                            <td class="p-2">Tasa de Éxito</td>
+                            <td class="p-2 font-medium text-slate-800">100% (Completado)</td>
+                            <td class="p-2">Cumplimiento total del objetivo de la tarea.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2">Cualitativa</td>
+                            <td class="p-2">Satisfacción CSAT</td>
+                            <td class="p-2 font-medium text-slate-800">&ge; 4.0 / 5.0</td>
+                            <td class="p-2">Percepción general de confort del usuario.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2">Cualitativa</td>
+                            <td class="p-2">Facilidad SEQ</td>
+                            <td class="p-2 font-medium text-slate-800">&ge; 5.0 / 7.0</td>
+                            <td class="p-2">Esfuerzo mental reportado tras la acción.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Observaciones y Conclusiones para Exportación -->
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-3">
+        <!-- Análisis Gráfico -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                <h4 class="font-bold text-slate-800 text-xs mb-3 self-start">Distribución Global de Usabilidad</h4>
+                <div class="w-56 h-56">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center">
+                <h4 class="font-bold text-slate-800 text-xs mb-3 self-start">Tiempo Promedio por Componente (s)</h4>
+                <div class="w-full h-56">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Resultados -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-200">
+                <h3 class="font-bold text-slate-800 text-sm">Tabla de Resultados de Usabilidad</h3>
+                <p class="text-xs text-slate-500">Evaluación consolidada de parámetros cuantitativos y cualitativos</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="bg-slate-800 text-white uppercase font-bold text-[11px]">
+                        <tr>
+                            <th class="p-3">ID / TAREA</th>
+                            <th class="p-3">COMPONENTE</th>
+                            <th class="p-3">TIEMPO (S)</th>
+                            <th class="p-3">ERRORES</th>
+                            <th class="p-3">ÉXITO</th>
+                            <th class="p-3">CSAT / SEQ</th>
+                            <th class="p-3">OBSERVACIONES</th>
+                            <th class="p-3">ESTADO USABILIDAD</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usability-table-body" class="divide-y divide-slate-200">
+                        <!-- Generado dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dictamen y Conclusiones del Reporte -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
             <h3 class="font-bold text-slate-800 text-sm">Dictamen y Conclusiones del Reporte</h3>
-            <textarea id="report-conclusions" rows="3" placeholder="Ingrese las recomendaciones técnicas del equipo de UX para corregir los puntos no aceptables..." class="w-full p-3 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">El análisis muestra una oportunidad de mejora significativa en los componentes de Entrada de Datos y Formularios debido a tiempos de respuesta elevados y tasas de error en la validación. Se recomienda simplificar la interfaz de captura de datos y mejorar las pistas de ayuda dinámicas.</textarea>
+            <textarea id="report-conclusions" rows="4" class="w-full p-3 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed overflow-hidden resize-none">El análisis muestra una oportunidad de mejora significativa en los componentes de Búsqueda y Navegación debido a tiempos de respuesta elevados (mayores a 15s) y tasas de error en la interacción. Se recomienda simplificar la interfaz de filtros dinámicos, visibilizar botones de acción principal y optimizar la jerarquía del menú desplegable.</textarea>
         </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-auto no-print">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p>Plataforma para Pruebas de Usabilidad e Interacción Humano-Computador (HCI)</p>
-            <p class="mt-1 text-slate-500">Desarrollo Web - Actividad de Métricas de Usabilidad</p>
-        </div>
-    </footer>
-
-    <!-- Archivo de Lógica JavaScript -->
     <script src="main.js"></script>
 </body>
 </html>
